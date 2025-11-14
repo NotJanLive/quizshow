@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Quiz Show</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="screen active">
+            <div class="container">
+                <h1 class="title">🎮 Multiplayer Quiz Show</h1>
+                
+                <div class="lobby-options">
+                    <div class="option-card">
+                        <h2>Host erstellen</h2>
+                        <input type="text" id="host-name-input" placeholder="Dein Name" class="input">
+                        <button id="create-room-btn" class="btn btn-primary">Raum erstellen</button>
+                    </div>
+
+                    <div class="option-divider">ODER</div>
+
+                    <div class="option-card">
+                        <h2>Raum beitreten</h2>
+                        <input type="text" id="player-name-input" placeholder="Dein Name" class="input">
+                        <input type="text" id="room-code-input" placeholder="Raumcode (6 Zeichen)" class="input" maxlength="6">
+                        <button id="join-room-btn" class="btn btn-secondary">Beitreten</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting Room -->
+        <div id="waiting-room" class="screen">
+            <div class="container">
+                <h1 class="title">Warteraum</h1>
+                <div class="room-code-display">
+                    Raumcode: <span id="display-room-code" class="room-code">------</span>
+                </div>
+                
+                <div class="players-list-container">
+                    <h2>Spieler im Raum:</h2>
+                    <div id="waiting-players-list" class="players-list"></div>
+                </div>
+
+                <div id="host-controls" class="host-controls" style="display: none;">
+                    <h3>Spielmodus auswählen:</h3>
+                    <button class="btn btn-primary" data-mode="last-man-standing">1️⃣ Last Man Standing</button>
+                    <button class="btn btn-primary" data-mode="wwm">2️⃣ Wer wird Millionär (WWM)</button>
+                    <button class="btn btn-primary" data-mode="higher-or-lower">3️⃣ Higher or Lower</button>
+                    <button class="btn btn-primary" data-mode="symbol-quiz">4️⃣ Symbol Quiz</button>
+                    <button class="btn btn-primary" data-mode="jeopardy">5️⃣ Jeopardy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Man Standing - Player View -->
+        <div id="lms-player-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Last Man Standing</h1>
+                    <div class="round-info">Runde <span id="lms-player-round">1</span> / 5</div>
+                </div>
+
+                <h2 id="lms-player-theme" class="theme-title">Thema wird geladen...</h2>
+
+                <div class="keywords-grid" id="lms-player-keywords"></div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="lms-player-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Man Standing - Host View -->
+        <div id="lms-host-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Last Man Standing - Host</h1>
+                    <div class="round-info">Runde <span id="lms-host-round">1</span> / 5</div>
+                </div>
+
+                <h2 id="lms-host-theme" class="theme-title">Thema wird geladen...</h2>
+
+                <div class="keywords-grid" id="lms-host-keywords"></div>
+
+                <div class="host-panel">
+                    <h3>Spieler-Management:</h3>
+                    <div id="lms-host-players" class="host-players-list"></div>
+                    
+                    <div class="host-actions">
+                        <button id="lms-next-round-btn" class="btn btn-primary">Nächste Runde</button>
+                        <button id="show-leaderboard-btn" class="btn btn-accent">Zwischenstand anzeigen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WWM - Player View -->
+        <div id="wwm-player-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Wer wird Millionär</h1>
+                    <div class="round-info">Frage <span id="wwm-player-question-num">1</span> / 30</div>
+                </div>
+
+                <div class="question-display">
+                    <h2 id="wwm-player-question" class="question-text">Frage wird geladen...</h2>
+                    <p class="question-points">Punkte für diese Frage: <span id="wwm-player-question-points">1</span>P</p>
+                </div>
+
+                <div class="answers-grid" id="wwm-player-answers"></div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="wwm-player-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WWM - Host View -->
+        <div id="wwm-host-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Wer wird Millionär - Host</h1>
+                    <div class="round-info">Frage <span id="wwm-host-question-num">1</span> / 30</div>
+                </div>
+
+                <div class="question-display">
+                    <h2 id="wwm-host-question" class="question-text">Frage wird geladen...</h2>
+                    <p class="question-points">Punkte für diese Frage: <span id="wwm-host-question-points">1</span>P</p>
+                </div>
+
+                <div class="answers-grid host-answers" id="wwm-host-answers"></div>
+
+                <div class="host-panel">
+                    <h3>Player Answers:</h3>
+                    <div id="wwm-host-player-answers" class="player-answers-list"></div>
+                    
+                    <div class="host-actions">
+                        <button id="wwm-reveal-answer-btn" class="btn btn-secondary">Antwort revealen</button>
+                        <button id="wwm-next-question-btn" class="btn btn-primary">Nächste Frage</button>
+                    </div>
+                </div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="wwm-host-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Higher or Lower - Player View -->
+        <div id="hol-player-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Higher or Lower</h1>
+                    <div class="round-info">Runde <span id="hol-player-round">1</span> / 3</div>
+                </div>
+
+                <div class="external-mode-notice">
+                    <h2>📱 Dieser Modus wird extern gespielt!</h2>
+                    <p>Der Host leitet das Spiel auf einem anderen Bildschirm.</p>
+                </div>
+
+                <div class="scoreboard">
+                    <h3>Dein Status:</h3>
+                    <div id="hol-player-status" class="player-status">
+                        <div class="status-item">
+                            <span class="status-label">Punkte (dieser Modus):</span>
+                            <span id="hol-player-points" class="status-value">0P</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Gesamtpunkte:</span>
+                            <span id="hol-player-total" class="status-value">0P</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Leben:</span>
+                            <span id="hol-player-lives" class="status-value">❤️❤️</span>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 2rem;">Alle Spieler:</h3>
+                    <div id="hol-player-all-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Higher or Lower - Host View -->
+        <div id="hol-host-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Higher or Lower - Host</h1>
+                    <div class="round-info">Runde <span id="hol-host-round">1</span> / 3</div>
+                </div>
+
+                <div class="host-panel">
+                    <h3>Spieler-Management:</h3>
+                    <div id="hol-host-players" class="host-players-list"></div>
+                    
+                    <div class="host-actions">
+                        <button id="hol-next-round-btn" class="btn btn-primary">Nächste Runde</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symbol Quiz - Player View -->
+        <div id="sq-player-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Symbol Quiz</h1>
+                    <div class="round-info">Frage <span id="sq-player-theme-num">1</span> / 16</div>
+                </div>
+
+                <div class="tips-display">
+                    <div class="tips-container" id="sq-player-tips"></div>
+                </div>
+
+                <div class="buzzer-status" id="sq-player-buzzer-status">
+                    <p id="sq-player-buzzer-text">Buzzern um zu antworten...</p>
+                </div>
+
+                <button id="sq-player-buzz-btn" class="btn btn-primary buzzer-button">BUZZERN</button>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="sq-player-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symbol Quiz - Host View -->
+        <div id="sq-host-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Symbol Quiz - Host</h1>
+                    <div class="round-info">Frage <span id="sq-host-theme-num">1</span> / 16</div>
+                </div>
+
+                <div class="tips-display">
+                    <div class="theme-keyword">
+                        <span id="sq-host-keyword">Thema</span>
+                    </div>
+                    <div class="tips-container" id="sq-host-tips"></div>
+                </div>
+
+                <div class="buzzer-status" id="sq-host-buzzer-status">
+                    <p id="sq-host-buzzer-text">Warte auf Buzzer...</p>
+                </div>
+
+                <div class="host-panel">
+                    <h3>Kontrollen:</h3>
+                    <div class="host-sq-controls">
+                        <button id="sq-reveal-tip-btn" class="btn btn-secondary">Nächster Tipp</button>
+                        <button id="sq-reset-buzzer-btn" class="btn btn-danger">Buzzer Resetten (Falsch)</button>
+                        <button id="sq-award-points-btn" class="btn btn-success">5 Punkte (Richtig)</button>
+                    </div>
+
+                    <div id="sq-host-buzzer-player" class="buzzer-player-info"></div>
+
+                    <div class="host-actions" style="margin-top: 1.5rem;">
+                        <button id="sq-next-theme-btn" class="btn btn-primary">Nächstes Thema</button>
+                    </div>
+                </div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="sq-host-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jeopardy - Player View -->
+        <div id="jp-player-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Jeopardy!</h1>
+                </div>
+
+                <div class="current-player-display">
+                    <span id="jp-player-current">Du bist an der Reihe!</span>
+                </div>
+
+                <div class="jeopardy-grid" id="jp-player-grid"></div>
+
+                <div class="question-display" id="jp-player-question-display" style="display: none;">
+                    <h2 id="jp-player-question-text">Frage wird geladen...</h2>
+                    <button id="jp-player-answer-btn" class="btn btn-primary" style="margin-top: 1rem;">Antwort bereit</button>
+                </div>
+
+                <div id="jp-player-buzzer-container" style="display: none; margin-top: 2rem;">
+                    <p style="font-size: 1.2rem; text-align: center; margin-bottom: 1rem;">Falsche Antwort! Buzzern um zu antworten:</p>
+                    <button id="jp-player-buzz-btn" class="btn btn-primary buzzer-button">BUZZERN</button>
+                </div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="jp-player-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jeopardy - Host View -->
+        <div id="jp-host-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h1 class="game-title">Jeopardy - Host</h1>
+                </div>
+
+                <div class="current-player-display">
+                    <span id="jp-host-current">Spieler: <strong id="jp-host-current-name">...</strong></span>
+                </div>
+
+                <div class="jeopardy-grid" id="jp-host-grid"></div>
+
+                <div class="question-display" id="jp-host-question-display" style="display: none;">
+                    <h2 id="jp-host-question-text">Frage wird geladen...</h2>
+                    <p id="jp-host-question-answer" style="margin-top: 1rem; font-size: 1.1rem;"></p>
+                    
+                    <div id="jp-host-controls" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <button id="jp-host-correct-btn" class="btn btn-success">✓ Richtig</button>
+                        <button id="jp-host-wrong-btn" class="btn btn-danger">✗ Falsch</button>
+                    </div>
+
+                    <div id="jp-host-buzzer-info" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 10px;">
+                        <p id="jp-host-buzzer-player-info" style="font-size: 1.2rem; color: var(--accent); margin-bottom: 1rem;"></p>
+                        <button id="jp-host-buzzer-correct-btn" class="btn btn-success">✓ Richtig (50%)</button>
+                        <button id="jp-host-skip-buzz-btn" class="btn btn-secondary" style="margin-top: 0.5rem;">Nächste Frage</button>
+                    </div>
+
+                    <button id="jp-host-next-question-btn" class="btn btn-primary" style="margin-top: 1rem; display: none;">Nächste Frage</button>
+                </div>
+
+                <div class="scoreboard">
+                    <h3>Punktestand:</h3>
+                    <div id="jp-host-scores" class="scores-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" class="screen">
+            <div class="container">
+                <h1 class="title">🏆 Punktestand</h1>
+                
+                <div class="leaderboard" id="leaderboard-list"></div>
+
+                <div id="host-leaderboard-controls" class="host-controls" style="display: none; text-align: center; margin-top: 2rem;">
+                    <button id="continue-from-leaderboard-btn" class="btn btn-primary" style="max-width: 400px; margin: 0 auto;">
+                        → Nächster Modus
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Toast -->
+        <div id="error-toast" class="toast">
+            <span id="error-message"></span>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/host.js"></script>
+    <script src="js/player.js"></script>
+</body>
+</html>

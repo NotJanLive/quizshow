@@ -1,0 +1,20 @@
+{
+  "name": "multiplayer-quiz-show",
+  "version": "1.0.0",
+  "description": "Multiplayer Quiz Show mit Last Man Standing und 4 weiteren Modi",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "keywords": ["quiz", "multiplayer", "socket.io", "game"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
